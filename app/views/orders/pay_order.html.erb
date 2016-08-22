@@ -1,0 +1,105 @@
+<br><br><br><hr>
+<%
+   require 'libwebpay'
+   require_relative '../certificates/certnormal.rb'
+
+   sessionId = 'aj2h4kj2'
+   returnUrl = "localhost:3000/orders/#{@order.id}?option=webpayNormalGetResult"
+   finalUrl = "localhost:3000/orders/#{@order.id}?option=end"
+   amount = @total
+   path = ''
+   idSession = ''
+   response_code = ''
+   buyOrder = @order.id
+
+
+
+   if (params[:option])
+     action = params[:option]
+   else
+     action = "init"
+   end
+
+   #abort( "####################"+action+"####################")
+
+
+   #se rescatan variables de los certificados
+   certificates = Certnormal.new
+   webpay = Libwebpay.new(certificates)
+
+
+   case action
+     when "init"
+       #Llamada a libreria Webpay initTransaction
+       result_init = webpay.init_transaction(amount, buyOrder, sessionId, returnUrl, finalUrl)
+
+       token = result_init['token']
+       url = result_init['url']
+%>
+    N° orden: <%= @order.id %><br><br>
+    Fecha: <%= @order.date_order %><br><br>
+    Cliente: <%= @order.user.name %><br><br><br><br><hr>
+
+    Detalle:
+
+    <% @order.order_details.each do |detail| %>
+        ID: <%= detail.id %><br><br>
+        Producto: <%= detail.product.name %><br><br>
+        Precio: <%= detail.product.price %><hr><br><br>
+    <% end %>
+
+    <h1>Total: <%= @total %></h1>
+    <form action='<%=url%>' method="post">
+      <input type="hidden" name="token_ws" value='<%=token%>'><input type="submit" value="Ejecutar Pago con WebPay">
+    </form>
+
+<%
+   when "result"
+
+     if (params[:token_ws])
+       token = params[:token_ws]
+     end
+
+     #llamada a getResult
+     result_get = webpay.get_result(token)
+     accountingdate = result_get['accountingdate']
+     buyorder = result_get['buyorder']
+     cardnumber = result_get['cardnumber']
+     amount = result_get['amount']
+     commercecode = result_get['commercecode']
+     authorizationcode = result_get['authorizationcode']
+     paymenttypecode = result_get['paymenttypecode']
+     responsecode = result_get['responsecode']
+     transactiondate = result_get['transactiondate']
+     urlredirection = result_get['urlredirection']
+     vci = result_get['vci']
+%>
+
+<%
+   when "end"
+
+     if (params[:token_ws])
+       token = params[:token_ws]
+     end
+
+%>
+
+    <h2>Step: End</h2>
+    <div style="background-color:lightyellow;">
+      <h3>request</h3>
+      <br>
+      <br>
+    </div>
+
+    <div style="background-color:lightgrey;">
+      <h3>result</h3>
+      "[token_ws] =  <%=token%> "
+    </div>
+
+    <p><samp>Transacion Finalizada</samp></p>
+    <br>
+
+<%
+   end
+
+%>

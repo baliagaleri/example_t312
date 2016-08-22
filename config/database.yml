@@ -1,0 +1,31 @@
+default: &default
+  adapter: sqlite3
+  pool: 20
+  timeout: 5000
+
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV['DBNAME'] %>
+  pool: 5
+  username: <%= ENV['DBUSER'] %>
+  password: <%= ENV['DBPASS'] %>
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV['DBNAME'] %>
+  pool: 5
+  username: <%= ENV['DBUSER'] %>
+  password: <%= ENV['DBPASS'] %>
+
+production:
+  url:  <%= ENV["DATABASE_URL"] %>
+  pool: <%= ENV["DB_POOL"] || ENV['RAILS_MAX_THREADS'] || 5 %>
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV['RDS_DB_NAME'] %>
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  port: <%= ENV['RDS_PORT'] %>
