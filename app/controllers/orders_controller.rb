@@ -26,7 +26,7 @@ class OrdersController < ApplicationController
     if (params[:option])
       @action = params[:option]
     else
-      @action = "init"
+      @action = 'init'
     end
 
     #se rescatan variables de los certificados
