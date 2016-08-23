@@ -9,6 +9,66 @@ class OrdersController < ApplicationController
   def show
     @order = Order.find(params[:id])
     @total = OrderDetail.joins(:product).where(:order_id => @order.id).sum('products.price')
+
+    require 'libwebpay'
+    require_relative '../views/certificates/certnormal.rb'
+
+    urlReturn = "http://localhost:3000/orders/show/#{@order.id}?option=result"
+    urlFinal = "http://localhost:3000/orders/show/#{@order.id}?option=end"
+    amount = @total
+    path = ''
+    idSession = ''
+    response_code = ''
+    buyOrder = @order.id
+    sessionId = 'aj2h4kj2'
+
+
+    if (params[:option])
+      @action = params[:option]
+    else
+      @action = "init"
+    end
+
+    #se rescatan variables de los certificados
+    certificates = Certnormal.new
+    webpay = Libwebpay.new(certificates)
+
+    case @action
+      when 'init'
+        #Llamada a libreria Webpay initTransaction
+        result_init = webpay.init_transaction(amount, buyOrder, sessionId, urlReturn, urlFinal)
+
+        @token = result_init['token']
+        @url = result_init['url']
+
+      when 'result'
+
+        if (params[:token_ws])
+          token = params[:token_ws]
+        end
+
+        #llamada a getResult
+        @result_get = webpay.get_result(token)
+        accountingdate = @result_get['accountingdate']
+        buyorder = @result_get['buyorder']
+        cardnumber = @result_get['cardnumber']
+        amount = @result_get['amount']
+        commercecode = @result_get['commercecode']
+        authorizationcode = @result_get['authorizationcode']
+        paymenttypecode = @result_get['paymenttypecode']
+        responsecode = @result_get['responsecode']
+        transactiondate = @result_get['transactiondate']
+        urlredirection = @result_get['urlredirection']
+        vci = @result_get['vci']
+
+      when 'end'
+
+        if (params[:token_ws])
+          token = params[:token_ws]
+        end
+
+      end
+
     render template: "orders/show/#{params[:page]}"
   end
 
