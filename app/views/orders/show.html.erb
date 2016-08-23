@@ -51,5 +51,24 @@
 
 <%
    end
-
 %>
+
+<script>
+    function redireccionarPagina() {
+        window.location = "http://localhost:3000/orders/<%= @order.id  %>";
+    }
+
+    var action = "<%= @action %>";
+    console.log(action);
+
+    if (action == "result"){
+        console.log("resultados");
+        setTimeout("redireccionarPagina()", 10000);
+    }
+
+    if (action == "end"){
+        console.log("fin");
+        setTimeout("redireccionarPagina()", 5000);
+    }
+
+</script>

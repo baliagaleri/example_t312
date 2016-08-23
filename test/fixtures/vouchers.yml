@@ -1,0 +1,29 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  order_id: 
+  accounting_date: MyString
+  buy_order: MyString
+  cardnumber: MyString
+  amount: MyString
+  commerce_code: MyString
+  authorization_code: MyString
+  payment_type_code: MyString
+  response_code: MyString
+  transaction_date: MyString
+  url_direction: MyString
+  vci: MyString
+
+two:
+  order_id: 
+  accounting_date: MyString
+  buy_order: MyString
+  cardnumber: MyString
+  amount: MyString
+  commerce_code: MyString
+  authorization_code: MyString
+  payment_type_code: MyString
+  response_code: MyString
+  transaction_date: MyString
+  url_direction: MyString
+  vci: MyString

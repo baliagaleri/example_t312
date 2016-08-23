@@ -1,0 +1,1 @@
+json.partial! "operation_states/operation_state", operation_state: @operation_state

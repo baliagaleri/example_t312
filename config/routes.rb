@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'orders/pay_order'
+  resources :operation_states
   get 'orders/show/:id' => 'orders#show'
   post 'orders/show/:id' => 'orders#show'
   resources :order_details

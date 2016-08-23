@@ -1,0 +1,1 @@
+json.array! @operation_states, partial: 'operation_states/operation_state', as: :operation_state

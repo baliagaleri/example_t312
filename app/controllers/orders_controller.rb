@@ -20,7 +20,7 @@ class OrdersController < ApplicationController
     idSession = ''
     response_code = ''
     buyOrder = @order.id
-    sessionId = 'aj2h4kj2'
+    sessionId = @order.user_id
 
 
     if (params[:option])
@@ -41,14 +41,20 @@ class OrdersController < ApplicationController
         @token = result_init['token']
         @url = result_init['url']
 
+        #Operaciones internas#
+        if @order.operation_state_id.blank?
+          @order.operation_state_id = 1 #Sin realizar
+          @order.save
+        end
+
       when 'result'
 
         if (params[:token_ws])
-          token = params[:token_ws]
+          @token = params[:token_ws]
         end
 
         #llamada a getResult
-        @result_get = webpay.get_result(token)
+        @result_get = webpay.get_result(@token)
         accountingdate = @result_get['accountingdate']
         buyorder = @result_get['buyorder']
         cardnumber = @result_get['cardnumber']
@@ -61,11 +67,36 @@ class OrdersController < ApplicationController
         urlredirection = @result_get['urlredirection']
         vci = @result_get['vci']
 
+        #Operaciones internas#
+        if response_code.to_i.zero?
+          @order.operation_state_id = 2 #Aceptada
+          @order.save
+          voucher = Voucher.new
+          voucher.order_id = @order.id
+          voucher.accounting_date = accountingdate
+          voucher.buy_order = buyorder
+          voucher.cardnumber = cardnumber
+          voucher.amount = amount
+          voucher.commerce_code = commercecode
+          voucher.authorization_code = authorizationcode
+          voucher.payment_type_code = paymenttypecode
+          voucher.response_code = responsecode
+          voucher.transaction_date = transactiondate
+          voucher.url_direction = urlredirection
+          voucher.vci = vci
+          voucher.save
+        end
+
+
       when 'end'
 
         if (params[:token_ws])
-          token = params[:token_ws]
+          @token = params[:token_ws]
         end
+
+        #Operaciones internas#
+        @order.operation_state_id = 3 #Rechazada o finalizada
+        @order.save
 
       end
 
@@ -79,13 +110,9 @@ class OrdersController < ApplicationController
   def edit
   end
 
-  def pay_order
-    @order = Order.find(params[:order_id])
-    @total = OrderDetail.joins(:product).where(:order_id => @order.id).sum('products.price')
-  end
-
   def create
     @order = Order.new(order_params)
+    @order.operation_state_id = 1 #Sin realizar
 
     respond_to do |format|
       if @order.save
