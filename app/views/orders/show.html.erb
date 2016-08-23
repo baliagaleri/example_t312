@@ -3,8 +3,8 @@
    require 'libwebpay'
    require_relative '../certificates/certnormal.rb'
 
-   urlReturn = "http://localhost:3000/orders/#{@order.id}?option=result"
-   urlFinal = "http://localhost:3000/orders/#{@order.id}?option=end"
+   urlReturn = "http://localhost:3000/orders/show/#{@order.id}?option=result"
+   urlFinal = "http://localhost:3000/orders/show/#{@order.id}?option=end"
    amount = @total
    path = ''
    idSession = ''
@@ -74,6 +74,8 @@
      vci = result_get['vci']
 %>
 
+    <%= result_get %>
+    <h1>Bien!</h1>
 <%
    when "end"
 

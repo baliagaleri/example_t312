@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
 
-  before_action :set_order, only: [:show, :edit, :update, :destroy]
+  protect_from_forgery except: :index
 
   def index
     @orders = Order.all
@@ -9,6 +9,7 @@ class OrdersController < ApplicationController
   def show
     @order = Order.find(params[:id])
     @total = OrderDetail.joins(:product).where(:order_id => @order.id).sum('products.price')
+    render template: "orders/show/#{params[:page]}"
   end
 
   def new
